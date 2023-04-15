@@ -1,0 +1,14 @@
+# Dotenv
+.env
+
+# Python
+env/
+__pycache__/
+
+# Google credentials
+token.json
+credentials.json
+
+# Others
+examples/
+.vscode/
