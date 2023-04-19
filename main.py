@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 from config.config import get_config
-from jira_manager.epic import epic_in_progress_tasks
+from jira_manager.formatting import epic_in_progress_tasks_to_gdocs
 from gdocs.handlers import handle_tags
 
 if __name__ == "__main__":

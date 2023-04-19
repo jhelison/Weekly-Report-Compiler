@@ -42,48 +42,8 @@ from gdocs.elements.text import SimpleText, TableHeaderText, ChipText, TextWithL
 # }
 
 
-def create_table_request(location: int) -> list:
+def create_table_request(location: int, content: dict) -> list:
     requests = []
-
-    content = {
-        "headers": [0, 1],
-        "text": [
-            [
-                TableHeaderText("Assignee"),
-                TableHeaderText("Task"),
-                TableHeaderText("ETA"),
-                TableHeaderText("Status"),
-            ],
-            [
-                TableHeaderText(" "),
-                TableHeaderText("EVMOS FORK - MILESTONE 1"),
-                ChipText("2023-01-01"),
-                TableHeaderText(" "),
-            ],
-            [
-                ChipText("Jhelison"),
-                TextWithLink(
-                    "CAYAG-45",
-                    "https://brickabode-internal.atlassian.net/browse/CAYAG-40",
-                    ": [Evmos] Standalone to consumer chain",
-                ),
-                ChipText("2023-01-01"),
-                SimpleText("TODO"),
-            ],
-            [
-                ChipText("Jhelison"),
-                TextWithLink(
-                    "CAYAG-46",
-                    "https://brickabode-internal.atlassian.net/browse/CAYAG-46",
-                    ": [Evmos] Renaming to Ethos",
-                ),
-                ChipText("2020-12-12"),
-                SimpleText("WIP"),
-            ],
-        ],
-        "num_columns": 4,
-        "num_rows": 4,
-    }
 
     num_rows = content["num_rows"]
     num_columns = content["num_columns"]

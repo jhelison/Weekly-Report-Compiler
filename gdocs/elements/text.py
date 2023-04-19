@@ -1,3 +1,6 @@
+from gdocs.elements.status import Status, status_color
+
+
 class Text:
     def requests(self, position: int) -> list:
         pass
@@ -8,6 +11,9 @@ class Text:
 
 class SimpleText(Text):
     def __init__(self, text: str):
+        if not text:
+            self.text = " "
+            return
         self.text = text
 
     def requests(self, position: int) -> list:
@@ -30,6 +36,9 @@ class SimpleText(Text):
 
 class TableHeaderText(Text):
     def __init__(self, text: str):
+        if not text:
+            self.text = " "
+            return
         self.text = text
 
     def requests(self, position: int) -> list:
@@ -75,6 +84,9 @@ class TableHeaderText(Text):
 
 class ChipText(Text):
     def __init__(self, text: str):
+        if not text:
+            self.text = " "
+            return
         self.text = text
 
     def requests(self, position: int) -> list:
@@ -96,17 +108,8 @@ class ChipText(Text):
                         "startIndex": position,
                         "endIndex": position + len(self.text),
                     },
-                    "textStyle": {
-                        "foregroundColor": {
-                            "color": {"rgbColor": {"red": 0, "green": 0, "blue": 0}}
-                        },
-                        "backgroundColor": {
-                            "color": {
-                                "rgbColor": {"red": 0.9, "green": 0.9, "blue": 0.9}
-                            }
-                        },
-                    },
-                    "fields": "foregroundColor,backgroundColor, fontSize",
+                    **status_color(self.as_status()),
+                    "fields": "foregroundColor, backgroundColor",
                 }
             }
         )
@@ -115,6 +118,12 @@ class ChipText(Text):
 
     def len(self) -> int:
         return len(self.text)
+
+    def as_status(self):
+        try:
+            return Status(self.text)
+        except:
+            return self.text
 
 
 class TextWithLink(Text):

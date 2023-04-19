@@ -6,9 +6,8 @@ from config.config import get_config
 # Get all the epics in "Work in Progress" status
 def epic_in_progress():
     jira = new_jira()
-    return jira.search_issues(EPIC_IN_PROGRESS_JQL.format(
-        get_config()["project"]
-    ))
+    return jira.search_issues(EPIC_IN_PROGRESS_JQL.format(get_config()["project"]))
+
 
 def epic_in_progress_tasks():
     jira = new_jira()
@@ -21,4 +20,3 @@ def epic_in_progress_tasks():
         tasks_by_epic[epic] = tasks
 
     return tasks_by_epic
-
