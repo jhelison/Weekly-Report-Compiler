@@ -11,3 +11,6 @@ class Tags(Enum):
 
     # Table tag
     WORKED_TASKS_TABLE = "<worked_tasks_table>"
+
+    # Worked tasks list
+    WORKED_TASKS_LIST = "<worked-tasks-list>"

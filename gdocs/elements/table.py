@@ -1,5 +1,5 @@
-from gdocs.elements.text import SimpleText, TableHeaderText, ChipText, TextWithLink
-
+from gdocs.elements.text import Text
+from typing import List
 
 # content = {
 #     "headers": [0, 1],
@@ -135,7 +135,7 @@ def set_headers_style(location: int, num_columns: int, rows_indexes: list) -> li
     return requests
 
 
-def set_text(location: int, texts: list) -> list:
+def set_text(location: int, texts: List[List[Text]]) -> list:
     requests = []
 
     # First position considering table base spacing
@@ -143,10 +143,12 @@ def set_text(location: int, texts: list) -> list:
 
     for row in texts:
         for text in row:
-            requests.append(text.requests(text_position))
-            text_position += text.len() + 2
-
+            text.position = text_position
+            requests.append(text.requests)
+            text_position = text.last_position + 2
         # Add 1 to jump to the next row
         text_position += 1
+
+    # print(requests)
 
     return requests

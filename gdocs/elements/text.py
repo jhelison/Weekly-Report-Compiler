@@ -1,186 +1,130 @@
-from gdocs.elements.status import Status, status_color
+from typing import Type
+from gdocs.elements.util import Color
 
 
 class Text:
-    def requests(self, position: int) -> list:
-        pass
+    def __init__(self, position=0, requests=[], last_position=0):
+        self._position = position
+        self._requests = requests
+        self._last_position = last_position
 
-    def len(self) -> int:
-        pass
+    @property
+    def position(self):
+        return self._position
 
+    @position.setter
+    def position(self, value):
+        delta = value - self._position
 
-class SimpleText(Text):
-    def __init__(self, text: str):
-        if not text:
-            self.text = " "
-            return
-        self.text = text
+        new_request = self._requests
+        for request in new_request:
+            if "insertText" in request:
+                request["insertText"]["location"]["index"] += delta
+            elif "updateTextStyle" in request:
+                request["updateTextStyle"]["range"]["startIndex"] += delta
+                request["updateTextStyle"]["range"]["endIndex"] += delta
 
-    def requests(self, position: int) -> list:
-        requests = []
+        self._position += delta
+        self._last_position += delta
+        self._requests = new_request
 
-        requests.append(
-            {
-                "insertText": {
-                    "location": {"index": position},
-                    "text": self.text,
-                }
+    @property
+    def last_position(self):
+        return self._last_position
+
+    @property
+    def requests(self):
+        return self._requests
+
+    def add_text(self, text) -> Type["Text"]:
+        request = {
+            "insertText": {
+                "location": {"index": self.position},
+                "text": text,
             }
+        }
+
+        self._last_position = self.position + len(text)
+
+        return Text(
+            position=self.position,
+            requests=self._requests + [request],
+            last_position=self._last_position,
         )
 
-        return requests
-
-    def len(self) -> int:
-        return len(self.text)
-
-
-class TableHeaderText(Text):
-    def __init__(self, text: str):
-        if not text:
-            self.text = " "
-            return
-        self.text = text
-
-    def requests(self, position: int) -> list:
-        requests = []
-
-        requests.append(
-            {
-                "insertText": {
-                    "location": {"index": position},
-                    "text": self.text,
-                }
+    def add_font_size(
+        self, font_size: int, start: int = None, end: int = None
+    ) -> Type["Text"]:
+        request = {
+            "updateTextStyle": {
+                "range": {
+                    "startIndex": start if start else self.position,
+                    "endIndex": end if end else self._last_position,
+                },
+                "textStyle": {
+                    "fontSize": {"magnitude": font_size, "unit": "PT"},
+                },
+                "fields": "fontSize",
             }
+        }
+
+        return Text(
+            position=self.position,
+            requests=self._requests + [request],
+            last_position=self._last_position,
         )
 
-        requests.append(
-            {
-                "updateTextStyle": {
-                    "range": {
-                        "startIndex": position,
-                        "endIndex": position + len(self.text),
-                    },
-                    "textStyle": {
-                        "foregroundColor": {
-                            "color": {
-                                "rgbColor": {
-                                    "red": 255 / 256,
-                                    "green": 217 / 256,
-                                    "blue": 61 / 256,
-                                }
-                            }
-                        },
-                    },
-                    "fields": "foregroundColor",
-                }
+    def add_color(
+        self, color: Color, start: int = None, end: int = None, background=True
+    ) -> Type["Text"]:
+        background_type = "backgroundColor" if background else "foregroundColor"
+        request = {
+            "updateTextStyle": {
+                "range": {
+                    "startIndex": start if start else self.position,
+                    "endIndex": end if end else self._last_position,
+                },
+                "textStyle": {
+                    background_type: color.as_color_request(),
+                },
+                "fields": background_type,
             }
+        }
+
+        return Text(
+            position=self.position,
+            requests=self._requests + [request],
+            last_position=self._last_position,
         )
 
-        return requests
-
-    def len(self) -> int:
-        return len(self.text)
-
-
-class ChipText(Text):
-    def __init__(self, text: str):
-        if not text:
-            self.text = " "
-            return
-        self.text = text
-
-    def requests(self, position: int) -> list:
-        requests = []
-
-        requests.append(
-            {
-                "insertText": {
-                    "location": {"index": position},
-                    "text": self.text,
-                }
+    def add_hyperlink(
+        self,
+        link: str,
+        start: int = None,
+        end: int = None,
+        foreground_color: Color = None,
+        underline=True,
+    ) -> Type["Text"]:
+        default_foreground_color = {"color": {"rgbColor": {"blue": 1.0}}}
+        request = {
+            "updateTextStyle": {
+                "range": {
+                    "startIndex": start if start else self.position,
+                    "endIndex": end if end else self._last_position,
+                },
+                "textStyle": {
+                    "underline": underline,
+                    "foregroundColor": foreground_color.as_color_request()
+                    if foreground_color
+                    else default_foreground_color,
+                    "link": {"url": link},
+                },
+                "fields": "underline, foregroundColor, link",
             }
+        }
+
+        return Text(
+            position=self.position,
+            requests=self._requests + [request],
+            last_position=self._last_position,
         )
-
-        requests.append(
-            {
-                "updateTextStyle": {
-                    "range": {
-                        "startIndex": position,
-                        "endIndex": position + len(self.text),
-                    },
-                    **status_color(self.as_status()),
-                    "fields": "foregroundColor, backgroundColor",
-                }
-            }
-        )
-
-        return requests
-
-    def len(self) -> int:
-        return len(self.text)
-
-    def as_status(self):
-        try:
-            return Status(self.text)
-        except:
-            return self.text
-
-
-class TextWithLink(Text):
-    def __init__(self, text: str, link: str, remaining_text: str):
-        self.text = text
-        self.link = link
-        self.remaining_text = remaining_text
-
-    def requests(self, position: int) -> list:
-        final_text = self.final_text()
-
-        requests = []
-
-        requests.append(
-            {
-                "insertText": {
-                    "location": {"index": position},
-                    "text": final_text,
-                }
-            }
-        )
-
-        # Add link styling
-        requests.append(
-            {
-                "updateTextStyle": {
-                    "range": {
-                        "startIndex": position,
-                        "endIndex": position + len(self.text),
-                    },
-                    "textStyle": {
-                        "underline": True,
-                        "foregroundColor": {"color": {"rgbColor": {"blue": 1.0}}},
-                    },
-                    "fields": "foregroundColor,underline",
-                }
-            }
-        )
-
-        # Add the hyperlink to the text
-        requests.append(
-            {
-                "updateTextStyle": {
-                    "range": {
-                        "startIndex": position,
-                        "endIndex": position + len(self.text),
-                    },
-                    "textStyle": {"link": {"url": self.link}},
-                    "fields": "link",
-                }
-            }
-        )
-
-        return requests
-
-    def len(self) -> int:
-        return len(self.final_text())
-
-    def final_text(self) -> str:
-        return self.text + self.remaining_text
