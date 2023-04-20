@@ -5,6 +5,7 @@ from gdocs.account import get_document_content, apply_content
 from gdocs.elements.table import create_table_request
 from gdocs.elements.util import find_tag, create_remove_content_requests
 from jira_manager.formatting import epic_in_progress_tasks_to_gdocs
+from jira_manager.epic import epic_in_progress_tasks
 from loguru import logger
 import json
 
@@ -65,10 +66,11 @@ def apply_worked_tasks_table(config: dict, tag: Tags):
         if location is None:
             logger.warning(f"Tag {tag.value} not found on document")
             return
-
-        content = epic_in_progress_tasks_to_gdocs()
-
         remove_request = create_remove_content_requests(location, tag_length)
+
+        # Fetch the data, process it and build the table requests
+        tasks_by_epic = epic_in_progress_tasks()
+        content = epic_in_progress_tasks_to_gdocs(tasks_by_epic)
         table_request = create_table_request(location, content)
 
         final_request = [*remove_request, *table_request]
@@ -90,10 +92,10 @@ def apply_worked_tasks_list(config: dict, tag: Tags):
         if location is None:
             logger.warning(f"Tag {tag.value} not found on document")
             return
+        remove_request = create_remove_content_requests(location, tag_length)
 
         content = epic_in_progress_tasks_to_gdocs()
 
-        remove_request = create_remove_content_requests(location, tag_length)
         table_request = create_table_request(location, content)
 
         final_request = [*remove_request, *table_request]

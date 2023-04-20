@@ -45,8 +45,8 @@ from typing import List
 def create_table_request(location: int, content: dict) -> list:
     requests = []
 
-    num_rows = content["num_rows"]
-    num_columns = content["num_columns"]
+    num_rows = len(content["text"])
+    num_columns = len(content["text"][0])
 
     # Insert a blank table at the tag location
     requests.append(create_table(location, num_columns, num_rows))

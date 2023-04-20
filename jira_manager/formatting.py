@@ -1,6 +1,5 @@
 from gdocs.elements.text import Text
 from gdocs.elements.util import Color, Status
-from jira_manager.epic import epic_in_progress_tasks
 import os
 
 # This is the between gdocs and jira_manager
@@ -15,8 +14,7 @@ TABLE_HEADER = [
 ]
 
 
-def epic_in_progress_tasks_to_gdocs():
-    tasks_by_epic = epic_in_progress_tasks()
+def epic_in_progress_tasks_to_gdocs(tasks_by_epic):
     jira_server = os.getenv("JIRA_SERVER")
 
     content = {}
@@ -95,7 +93,7 @@ def epic_in_progress_tasks_to_gdocs():
                 content["text"].append([assignee_name, issue_link, due_date, status])
                 row_num += 1
 
-    content["num_columns"] = len(TABLE_HEADER)
-    content["num_rows"] = len(content["text"])
-
     return content
+
+
+# def epic_task_to_gdocs(epic, tasks):

@@ -87,3 +87,7 @@ def create_remove_content_requests(location: int, tag_length: int) -> List[dict]
             }
         }
     ]
+
+
+def add_page_break(location: int) -> List[dict]:
+    return [{"insertPageBreak": {"location": {"index": location}}}]

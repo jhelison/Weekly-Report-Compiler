@@ -128,3 +128,25 @@ class Text:
             requests=self._requests + [request],
             last_position=self._last_position,
         )
+
+    def add_heading(
+        self, level: int, start: int = None, end: int = None
+    ) -> Type["Text"]:
+        request = {
+            "updateTextStyle": {
+                "range": {
+                    "startIndex": start if start else self.position,
+                    "endIndex": end if end else self._last_position,
+                },
+                "textStyle": {
+                    "namedStyleType": f"HEADING_{level}",
+                },
+                "fields": "namedStyleType",
+            }
+        }
+
+        return Text(
+            position=self.position,
+            requests=self._requests + [request],
+            last_position=self._last_position,
+        )
