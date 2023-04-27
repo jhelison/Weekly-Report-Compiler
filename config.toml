@@ -3,6 +3,7 @@
 project = "cayago"
 task_weekly_report_field = "customfield_10186"
 epic_weekly_report_field = "customfield_10191"
+epic_order_field = "customfield_10192"
 
 [doc]
 # Google doc configuration

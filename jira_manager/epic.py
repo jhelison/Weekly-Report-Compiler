@@ -7,7 +7,10 @@ from config.config import get_config
 def epic_in_progress():
     jira = new_jira()
     return jira.search_issues(
-        EPIC_IN_PROGRESS_JQL.format(get_config()["jira"]["project"])
+        EPIC_IN_PROGRESS_JQL.format(
+            get_config()["jira"]["project"],
+            get_config()["jira"]["epic_order_field"].split("_")[-1],
+        )
     )
 
 
