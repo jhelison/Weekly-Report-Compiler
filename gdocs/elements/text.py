@@ -97,6 +97,26 @@ class Text:
             last_position=self._last_position,
         )
 
+    def add_bold(self, start: int = None, end: int = None) -> Type["Text"]:
+        request = {
+            "updateTextStyle": {
+                "range": {
+                    "startIndex": start if start else self.position,
+                    "endIndex": end if end else self._last_position,
+                },
+                "textStyle": {
+                    "bold": True,
+                },
+                "fields": "bold",
+            }
+        }
+
+        return Text(
+            position=self.position,
+            requests=self._requests + [request],
+            last_position=self._last_position,
+        )
+
     def add_hyperlink(
         self,
         link: str,
@@ -132,14 +152,16 @@ class Text:
     def add_heading(
         self, level: int, start: int = None, end: int = None
     ) -> Type["Text"]:
+        heading = f"HEADING_{level}" if level > 0 else "NORMAL_TEXT"
+
         request = {
-            "updateTextStyle": {
+            "updateParagraphStyle": {
                 "range": {
                     "startIndex": start if start else self.position,
                     "endIndex": end if end else self._last_position,
                 },
-                "textStyle": {
-                    "namedStyleType": f"HEADING_{level}",
+                "paragraphStyle": {
+                    "namedStyleType": heading,
                 },
                 "fields": "namedStyleType",
             }
@@ -150,3 +172,24 @@ class Text:
             requests=self._requests + [request],
             last_position=self._last_position,
         )
+
+    def add_list(self, level: int, start: int = None, end: int = None) -> Type["Text"]:
+        request = {
+            "createParagraphBullets": {
+                "range": {
+                    "startIndex": start if start else self.position,
+                    "endIndex": end if end else self._last_position,
+                },
+                "bulletPreset": "BULLET_STAR_CIRCLE_SQUARE",
+            }
+        }
+
+        return Text(
+            position=self.position,
+            requests=self._requests + [request],
+            last_position=self._last_position,
+        )
+
+    @staticmethod
+    def new_line(position: int):
+        return Text(position).add_text("\n").requests, position + 1

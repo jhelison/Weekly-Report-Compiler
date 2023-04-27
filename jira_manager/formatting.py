@@ -22,7 +22,21 @@ def epic_in_progress_tasks_to_gdocs(tasks_by_epic):
     content["headers"] = [0]
 
     # Prepare the text section
-    content["text"] = [TABLE_HEADER]
+    content["text"] = []
+
+    # Prepare the header
+    content["text"].append(
+        [
+            Text()
+            .add_text("Assignee")
+            .add_color(color=BACKGROUND_COLOR, background=False),
+            Text().add_text("Task").add_color(color=BACKGROUND_COLOR, background=False),
+            Text().add_text("ETA").add_color(color=BACKGROUND_COLOR, background=False),
+            Text()
+            .add_text("Status")
+            .add_color(color=BACKGROUND_COLOR, background=False),
+        ]
+    )
 
     row_num = 1
     for epic, tasks in tasks_by_epic.items():

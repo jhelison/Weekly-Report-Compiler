@@ -1,9 +1,10 @@
-from gdocs.tags import Tags
 from gdocs.process import (
     apply_date_chip,
     apply_worked_tasks_table,
     apply_worked_tasks_list,
+    apply_markdown,
 )
+from gdocs.tags import Tags
 
 
 def handle_start_date_small(config: dict, tag: Tags):
@@ -30,13 +31,18 @@ def handle_worked_tasks_list(config: dict, tag: Tags):
     apply_worked_tasks_list(config, tag)
 
 
+def handle_markdown(config: dict, tag: Tags):
+    apply_markdown(config, tag)
+
+
 tag_handlers = {
     # Tags.START_DATE_SMALL: handle_start_date_small,
-    Tags.START_DATE_BIG: handle_start_date_big,
+    # Tags.START_DATE_BIG: handle_start_date_big,
     # Tags.END_DATE_SMALL: handle_end_date_small,
     # Tags.END_DATE_BIG: handle_end_date_big,
-    Tags.WORKED_TASKS_TABLE: handle_worked_tasks_table,
-    # Tags.WORKED_TASKS_LIST: handle_worked_tasks_list,
+    # Tags.WORKED_TASKS_TABLE: handle_worked_tasks_table,
+    Tags.WORKED_TASKS_LIST: handle_worked_tasks_list,
+    # Tags.MARKDOWN: handle_markdown,
 }
 
 

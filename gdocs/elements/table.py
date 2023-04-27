@@ -1,5 +1,6 @@
 from gdocs.elements.text import Text
 from typing import List
+import json
 
 # content = {
 #     "headers": [0, 1],
@@ -58,9 +59,10 @@ def create_table_request(location: int, content: dict) -> list:
     requests.append(set_headers_style(location, num_columns, content["headers"]))
 
     # Build the final cells text
-    requests.append(set_text(location, content["text"]))
+    request, text_position = set_text(location, content["text"])
+    requests.append(request)
 
-    return requests
+    return requests, text_position
 
 
 def create_table(location: int, num_columns: int, num_rows: int) -> list:
@@ -140,15 +142,20 @@ def set_text(location: int, texts: List[List[Text]]) -> list:
 
     # First position considering table base spacing
     text_position = location + 4
+    text_last_position = 0
 
     for row in texts:
         for text in row:
             text.position = text_position
             requests.append(text.requests)
             text_position = text.last_position + 2
+
+            text_last_position = (
+                text.last_position
+                if text.last_position > text_last_position
+                else text.last_position
+            ) + 2
         # Add 1 to jump to the next row
         text_position += 1
 
-    # print(requests)
-
-    return requests
+    return requests, text_last_position
