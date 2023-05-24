@@ -4,4 +4,4 @@ EPIC_IN_PROGRESS_JQL = (
 )
 
 # Return all tasks for a specific EPIC
-EPIC_TASKS_JQL = "parent = {} order by created"
+EPIC_TASKS_JQL = "parent = {} order by created ASC"

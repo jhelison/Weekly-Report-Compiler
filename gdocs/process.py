@@ -5,7 +5,7 @@ from gdocs.account import get_document_content, apply_content
 from gdocs.elements.table import create_table_request
 from gdocs.elements.util import find_tag, create_remove_content_requests, add_page_break
 from jira_manager.formatting import epic_in_progress_tasks_to_gdocs
-from gdocs.elements.markdown import Markdown, markdown_text
+from gdocs.elements.markdown import Markdown, markdown_text, clean_jira_markdown
 import jira2markdown
 from jira_manager.epic import epic_in_progress_tasks
 from loguru import logger
@@ -45,10 +45,10 @@ def apply_date_chip(
         color = Status.NONE.status_to_color()
         chip_request = (
             Text(location)
-            .add_text(str(config["dates"][date_type]))
+            .add_text(str(config["doc"][date_type]))
             .add_color(background=True, color=color.background)
             .add_color(background=False, color=color.foreground)
-            .add_font_size(config["style"]["text_size"][size])
+            # .add_font_size(config["style"]["text_size"][size])
             .requests
         )
 
@@ -128,28 +128,20 @@ def apply_worked_tasks_list(config: dict, tag: Tags):
             requests.append(road_map_text.requests)
             location = road_map_text.last_position
 
-            # Add a new line
-            request, location = Text.new_line(location)
-            requests.append(request)
-
             # Set the new table
             content = epic_in_progress_tasks_to_gdocs({epic: tasks})
             table_request, text_position = create_table_request(location, content)
             requests.append(table_request)
             location = text_position
 
-            # Add a new line
-            request, location = Text.new_line(location)
-            requests.append(request)
-
             if epic.fields.__dict__.get(config["jira"]["epic_weekly_report_field"]):
                 # Add the epic wr notes
                 markdown = Markdown(
                     location,
-                    jira2markdown.convert(
+                    clean_jira_markdown(jira2markdown.convert(
                         epic.fields.__dict__.get(
                             config["jira"]["epic_weekly_report_field"]
-                        )
+                        ))
                     ),
                 )
                 requests.append(markdown.process())
@@ -159,14 +151,26 @@ def apply_worked_tasks_list(config: dict, tag: Tags):
                 request, location = Text.new_line(location)
                 requests.append(request)
 
-            # Set the development progress header
-            header = Text(location).add_text("Current development").add_heading(2)
-            requests.append(header.requests)
-            location = header.last_position
+            # Check if at least one task has notes
+            has_notes = False
+            for task in tasks:
+                wr_note = task.fields.__dict__.get(
+                    config["jira"]["task_weekly_report_field"]
+                )
+                if wr_note:
+                    has_notes = True
 
-            # Add a new line
-            request, location = Text.new_line(location)
-            requests.append(request)
+            # Only set the develop progress header is tasks has notes
+
+            if has_notes:
+                # Set the development progress header
+                header = Text(location).add_text("Current development").add_heading(2)
+                requests.append(header.requests)
+                location = header.last_position
+
+                # Add a new line
+                request, location = Text.new_line(location)
+                requests.append(request)
 
             for task in tasks:
                 wr_note = task.fields.__dict__.get(
@@ -194,7 +198,7 @@ def apply_worked_tasks_list(config: dict, tag: Tags):
                 requests.append(request)
 
                 # Add the weekly report note
-                markdown = Markdown(location, jira2markdown.convert(wr_note))
+                markdown = Markdown(location, clean_jira_markdown(jira2markdown.convert(wr_note)))
                 requests.append(markdown.process())
                 location = markdown.position
 

@@ -9,7 +9,7 @@ LINKS_RE = r"\[([^\]]+)\]\(([^)]+)\)"
 EMPHASIS_RE = r"`([^`]+)`"
 BOLD_RE = r"\*\*([^*]+)\*\*"
 HEADER_RE = r"^(#+)\s(.*)$"
-LIST_RE = r"^(\s*([-+*]|[0-9]+\.)\s+.*)+$"
+LIST_RE = r"^(?<!\S)\s*-+\s+.+$"
 
 
 @dataclass
@@ -37,7 +37,6 @@ class Markdown:
                 self._text(line, matches)
 
             self._new_line()
-        # print(self._requests)
         return self._requests
 
     def _header(self, line: str, matches: List[Text]):
@@ -63,12 +62,23 @@ class Markdown:
 
         if match is None:
             return False
+        
+        # Replace the spaces with tabs
+        line = "\t"+line
+        replacements = 0
+        parts = line.split("-", maxsplit=1)
+        while "  " in parts[0]:
+            parts[0] = parts[0].replace("  ", "\t")
+            replacements += 1
+        parts[1] = "● " + parts[1]
+        line = "".join(parts)
 
-        text = Text(self.position).add_text(line.replace("-", "●", 1)).add_heading(0)
+        text = Text(self.position).add_text(line).add_heading(0)
         self._requests.append(text.requests)
         self.position = text.last_position
 
         for match in matches:
+            match.position = match.position - replacements + 2
             self._requests.append(match.requests)
 
         return True
@@ -159,3 +169,13 @@ Here are some of my favorite movies:
 I highly recommend all of these movies to anyone who loves great storytelling and memorable characters.
 
 """
+
+def clean_jira_markdown(markdown: str):
+    # Remove <u> on links
+    markdown = markdown.replace("</u>", "").replace("<u>", "")
+
+    # Remove empty lines
+    markdown = re.sub(r'\n{2}', '\n', markdown)
+    markdown = re.sub(r'\n{2,}', '\n\n', markdown)
+
+    return markdown
