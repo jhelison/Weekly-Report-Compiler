@@ -7,7 +7,7 @@ from gdocs.elements.util import find_tag, create_remove_content_requests, add_pa
 from jira_manager.formatting import epic_in_progress_tasks_to_gdocs
 from gdocs.elements.markdown import Markdown, markdown_text, clean_jira_markdown
 import jira2markdown
-from jira_manager.epic import epic_in_progress_tasks
+from jira_manager.epic import epic_in_progress, epic_in_progress_tasks, epic_appendix_in_progress
 from loguru import logger
 import json
 import os
@@ -72,7 +72,8 @@ def apply_worked_tasks_table(config: dict, tag: Tags):
         remove_request = create_remove_content_requests(location, tag_length)
 
         # Fetch the data, process it and build the table requests
-        tasks_by_epic = epic_in_progress_tasks()
+        epics = epic_in_progress()
+        tasks_by_epic = epic_in_progress_tasks(epics)
         content = epic_in_progress_tasks_to_gdocs(tasks_by_epic)
         table_request, _ = create_table_request(location, content)
 
@@ -99,7 +100,8 @@ def apply_worked_tasks_list(config: dict, tag: Tags):
         remove_request = create_remove_content_requests(location, tag_length)
 
         # Start here:
-        tasks_by_epic = epic_in_progress_tasks()
+        epics = epic_in_progress()
+        tasks_by_epic = epic_in_progress_tasks(epics)
         requests = []
         for epic, tasks in tasks_by_epic.items():
             # Set the header
@@ -130,7 +132,8 @@ def apply_worked_tasks_list(config: dict, tag: Tags):
 
             # Set the new table
             content = epic_in_progress_tasks_to_gdocs({epic: tasks})
-            table_request, text_position = create_table_request(location, content)
+            table_request, text_position = create_table_request(
+                location, content)
             requests.append(table_request)
             location = text_position
 
@@ -164,7 +167,8 @@ def apply_worked_tasks_list(config: dict, tag: Tags):
 
             if has_notes:
                 # Set the development progress header
-                header = Text(location).add_text("Current development").add_heading(2)
+                header = Text(location).add_text(
+                    "Current development").add_heading(2)
                 requests.append(header.requests)
                 location = header.last_position
 
@@ -198,13 +202,66 @@ def apply_worked_tasks_list(config: dict, tag: Tags):
                 requests.append(request)
 
                 # Add the weekly report note
-                markdown = Markdown(location, clean_jira_markdown(jira2markdown.convert(wr_note)))
+                markdown = Markdown(location, clean_jira_markdown(
+                    jira2markdown.convert(wr_note)))
                 requests.append(markdown.process())
                 location = markdown.position
 
             # Add a final page break
             requests.append(*add_page_break(location))
             location += 1
+
+        final_request = [*remove_request, *requests]
+
+        apply_content(config["doc"]["document_id"], final_request)
+        logger.success(f"Tag {tag.value} replaced with success")
+
+    except Exception as e:
+        raise e
+        logger.error(f"Error when processing tag {tag.value}, error {e}")
+
+
+def apply_appendix_tasks_list(config: dict, tag: Tags):
+    try:
+        jira_server = os.getenv("JIRA_SERVER")
+
+        doc_content = get_document_content(config["doc"]["document_id"])
+        # print(json.dumps(doc_content))
+        location, tag_length = find_tag(tag.value, doc_content)
+
+        if location is None:
+            logger.warning(f"Tag {tag.value} not found on document")
+            return
+        remove_request = create_remove_content_requests(location, tag_length)
+
+        # Start here:
+        epics = epic_appendix_in_progress()
+        tasks_by_epic = epic_in_progress_tasks(epics)
+        requests = []
+        for epic, tasks in tasks_by_epic.items():
+            # Set the header
+            header = (
+                Text(location)
+                .add_text(f"{epic.key}: {epic.fields.summary}")
+                .add_heading(3)
+                .add_hyperlink(
+                    link=jira_server + "/browse/" + epic.key,
+                    end=location + len(epic.key),
+                )
+            )
+            requests.append(header.requests)
+            location = header.last_position
+
+            # Set the new table
+            content = epic_in_progress_tasks_to_gdocs({epic: tasks})
+            table_request, text_position = create_table_request(
+                location, content)
+            requests.append(table_request)
+            location = text_position
+
+            # Add a new line
+            request, location = Text.new_line(location)
+            requests.append(request)
 
         final_request = [*remove_request, *requests]
 

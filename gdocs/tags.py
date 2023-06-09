@@ -15,4 +15,7 @@ class Tags(Enum):
     # Worked tasks list
     WORKED_TASKS_LIST = "<worked_tasks_list>"
 
+    # Appendix tasks list
+    APPENDIX_TASKS_LIST = "<appendix_tasks_list>"
+
     MARKDOWN = "<markdown>"

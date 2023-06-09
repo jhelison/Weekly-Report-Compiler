@@ -3,6 +3,7 @@ from gdocs.process import (
     apply_worked_tasks_table,
     apply_worked_tasks_list,
     apply_markdown,
+    apply_appendix_tasks_list
 )
 from gdocs.tags import Tags
 
@@ -31,6 +32,10 @@ def handle_worked_tasks_list(config: dict, tag: Tags):
     apply_worked_tasks_list(config, tag)
 
 
+def handle_appendix_tasks_list(config: dict, tag: Tags):
+    apply_appendix_tasks_list(config, tag)
+
+
 def handle_markdown(config: dict, tag: Tags):
     apply_markdown(config, tag)
 
@@ -42,6 +47,7 @@ tag_handlers = {
     Tags.END_DATE_BIG: handle_end_date_big,
     Tags.WORKED_TASKS_TABLE: handle_worked_tasks_table,
     Tags.WORKED_TASKS_LIST: handle_worked_tasks_list,
+    Tags.APPENDIX_TASKS_LIST: handle_appendix_tasks_list,
     # Tags.MARKDOWN: handle_markdown,
 }
 

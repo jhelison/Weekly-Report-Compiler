@@ -4,4 +4,7 @@ EPIC_IN_PROGRESS_JQL = (
 )
 
 # Return all tasks for a specific EPIC
-EPIC_TASKS_JQL = "parent = {} order by created ASC"
+EPIC_TASKS_JQL = 'parent = {} and status != "Routine" order by created ASC'
+
+# Return tasks for appendix
+APPENDIX_TASKS_LIST = 'project = Cayago and issuetype = Epic and key not in ("CAYAG-11", "CAYAG-18", "CAYAG-95", "CAYAG-85", "CAYAG-1", "CAYAG-5", "CAYAG-97") and status != "DONE"  ORDER BY summary'

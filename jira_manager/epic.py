@@ -1,5 +1,5 @@
 from jira_manager.account import new_jira
-from jira_manager.jql import EPIC_IN_PROGRESS_JQL, EPIC_TASKS_JQL
+from jira_manager.jql import EPIC_IN_PROGRESS_JQL, EPIC_TASKS_JQL, APPENDIX_TASKS_LIST
 from config.config import get_config
 
 
@@ -13,10 +13,21 @@ def epic_in_progress():
         )
     )
 
+# Get all the epics in "Work in Progress" status
 
-def epic_in_progress_tasks():
+
+def epic_appendix_in_progress():
     jira = new_jira()
-    epics = epic_in_progress()
+    return jira.search_issues(
+        APPENDIX_TASKS_LIST.format(
+            get_config()["jira"]["project"],
+            get_config()["jira"]["epic_order_field"].split("_")[-1],
+        )
+    )
+
+
+def epic_in_progress_tasks(epics):
+    jira = new_jira()
 
     # Organize tasks by epic
     tasks_by_epic = {}
