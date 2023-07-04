@@ -5,11 +5,17 @@ task_weekly_report_field = "customfield_10186"
 epic_weekly_report_field = "customfield_10191"
 epic_order_field = "customfield_10192"
 
+[jira.jql]
+# JQL Jira configuration
+epic_in_progress = 'project = {} and type = Epic and status = "in progress" order by cf[{}]'
+epic_tasks = 'parent = {} and status != "Routine" order by created ASC'
+appendix_task_list = 'project = Cayago and issuetype = Epic and key not in ("CAYAG-11", "CAYAG-18", "CAYAG-95", "CAYAG-85", "CAYAG-1", "CAYAG-5", "CAYAG-97") and status != "DONE"  ORDER BY summary'
+
 [doc]
 # Google doc configuration
-document_id = "1siFRMYiPS2NlVPjZNXbcKXo93hypZJP-jMg-asSWNcA"
-start_date = "2023-06-02"
-end_date = "2023-06-08"
+document_id = "1__rSbDP346deuh-JyRUKtUwgSK8eSH-k2qmJ9YV_HW8"
+start_date = "2023-06-26"
+end_date = "2023-06-30"
 
 [style]
 

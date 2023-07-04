@@ -96,7 +96,8 @@ def epic_in_progress_tasks_to_gdocs(tasks_by_epic):
                         .add_color(CHIP_COLOR.foreground, background=False)
                     )
 
-                status_color = Status(str(task.fields.status).upper()).status_to_color()
+                status_color = Status(
+                    str(task.fields.status).upper()).status_to_color()
                 status = (
                     Text()
                     .add_text(str(task.fields.status).upper())
@@ -104,7 +105,8 @@ def epic_in_progress_tasks_to_gdocs(tasks_by_epic):
                     .add_color(status_color.foreground, background=False)
                 )
 
-                content["text"].append([assignee_name, issue_link, due_date, status])
+                content["text"].append(
+                    [assignee_name, issue_link, due_date, status])
                 row_num += 1
 
     return content
