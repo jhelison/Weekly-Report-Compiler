@@ -2,6 +2,8 @@ from enum import Enum
 
 
 class Status(Enum):
+    """Enumeration representing the status of a task or item."""
+
     # Dates tag
     TODO = "TO DO"
     WIP = "IN PROGRESS"
@@ -11,6 +13,14 @@ class Status(Enum):
 
 
 def status_color(status: Status):
+    """Get the color configuration for a given status.
+
+    Args:
+        status (Status): The status value.
+
+    Returns:
+        dict: The color configuration for the status.
+    """
     if status == Status.TODO:
         return {
             "textStyle": {

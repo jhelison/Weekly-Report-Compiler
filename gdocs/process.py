@@ -5,11 +5,10 @@ from gdocs.account import get_document_content, apply_content
 from gdocs.elements.table import create_table_request
 from gdocs.elements.util import find_tag, create_remove_content_requests, add_page_break
 from jira_manager.formatting import epic_in_progress_tasks_to_gdocs
-from gdocs.elements.markdown import Markdown, markdown_text, clean_jira_markdown
+from gdocs.elements.markdown import Markdown, clean_jira_markdown
 import jira2markdown
 from jira_manager.epic import epic_in_progress, epic_in_progress_tasks, epic_appendix_in_progress
 from loguru import logger
-import json
 import os
 
 
@@ -17,20 +16,21 @@ def apply_date_chip(
     config: dict,
     tag: Tags,
 ):
+    """Apply a date chip to the Google Docs document based on the given tag.
+
+    Args:
+        config (dict): Configuration data.
+        tag (Tags): The date chip tag to be applied.
+    """
     date_type = None
-    size = None
     if tag == tag.START_DATE_SMALL:
         date_type = "start_date"
-        size = "small"
     elif tag == tag.START_DATE_BIG:
         date_type = "start_date"
-        size = "big"
     elif tag == tag.END_DATE_SMALL:
         date_type = "end_date"
-        size = "small"
     elif tag == tag.END_DATE_BIG:
         date_type = "end_date"
-        size = "big"
 
     try:
         doc_content = get_document_content(config["doc"]["document_id"])
@@ -48,7 +48,6 @@ def apply_date_chip(
             .add_text(str(config["doc"][date_type]))
             .add_color(background=True, color=color.background)
             .add_color(background=False, color=color.foreground)
-            # .add_font_size(config["style"]["text_size"][size])
             .requests
         )
 
@@ -61,6 +60,12 @@ def apply_date_chip(
 
 
 def apply_worked_tasks_table(config: dict, tag: Tags):
+    """Apply a worked tasks table to the Google Docs document based on the given tag.
+
+    Args:
+        config (dict): Configuration data.
+        tag (Tags): The worked tasks table tag to be applied.
+    """
     try:
         doc_content = get_document_content(config["doc"]["document_id"])
         # print(json.dumps(doc_content))
@@ -87,6 +92,12 @@ def apply_worked_tasks_table(config: dict, tag: Tags):
 
 
 def apply_worked_tasks_list(config: dict, tag: Tags):
+    """Apply a worked tasks list to the Google Docs document based on the given tag.
+
+    Args:
+        config (dict): Configuration data.
+        tag (Tags): The worked tasks list tag to be applied.
+    """
     try:
         jira_server = os.getenv("JIRA_SERVER")
 
@@ -217,11 +228,16 @@ def apply_worked_tasks_list(config: dict, tag: Tags):
         logger.success(f"Tag {tag.value} replaced with success")
 
     except Exception as e:
-        raise e
         logger.error(f"Error when processing tag {tag.value}, error {e}")
 
 
 def apply_appendix_tasks_list(config: dict, tag: Tags):
+    """Apply an appendix tasks list to the Google Docs document based on the given tag.
+
+    Args:
+        config (dict): Configuration data.
+        tag (Tags): The appendix tasks list tag to be applied.
+    """
     try:
         jira_server = os.getenv("JIRA_SERVER")
 
@@ -269,31 +285,4 @@ def apply_appendix_tasks_list(config: dict, tag: Tags):
         logger.success(f"Tag {tag.value} replaced with success")
 
     except Exception as e:
-        raise e
-        logger.error(f"Error when processing tag {tag.value}, error {e}")
-
-
-def apply_markdown(config: dict, tag: Tags):
-    try:
-        doc_content = get_document_content(config["doc"]["document_id"])
-        location, tag_length = find_tag(tag.value, doc_content)
-
-        location = 1
-        # if location is None:
-        #     logger.warning(f"Tag {tag.value} not found on document")
-        #     return
-
-        # remove_request = create_remove_content_requests(location, tag_length)
-
-        # Fetch the data, process it and build the table requests
-        requests = Markdown(location, markdown_text).process()
-
-        # final_request = [*remove_request, *requests]
-        final_request = [*requests]
-
-        apply_content(config["doc"]["document_id"], final_request)
-        logger.success(f"Tag {tag.value} replaced with success")
-
-    except Exception as e:
-        raise e
         logger.error(f"Error when processing tag {tag.value}, error {e}")

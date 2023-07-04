@@ -7,11 +7,25 @@ MAX_COLOR_VALUES = 255
 
 class Color:
     def __init__(self, red: int, green: int, blue: int):
+        """
+        Represents a color with RGB values.
+
+        Args:
+            red (int): The value of the red component of the color (0-255).
+            green (int): The value of the green component of the color (0-255).
+            blue (int): The value of the blue component of the color (0-255).
+        """
         self.red = red
         self.green = green
         self.blue = blue
 
     def as_color_request(self):
+        """
+        Returns the color as a request object compatible with Google Docs API.
+
+        Returns:
+            dict: The color request object.
+        """
         return {
             "color": {
                 "rgbColor": {
@@ -39,6 +53,12 @@ class Status(Enum):
     NONE = None
 
     def status_to_color(self):
+        """
+        Returns the background and foreground colors associated with the status.
+
+        Returns:
+            StatusColor: The background and foreground colors associated with the status.
+        """
         if self == Status.TODO:
             return StatusColor(
                 foreground=Color(71, 56, 33), background=Color(255, 229, 160)
@@ -62,6 +82,16 @@ class Status(Enum):
 # Find a tag on the google docs document
 # Returns the position and the tag_length
 def find_tag(tag: str, content: list) -> Tuple[Union[int, None], Union[int, None]]:
+    """
+    Finds a tag in the Google Docs document content.
+
+    Args:
+        tag (str): The tag to search for.
+        content (list): The content of the Google Docs document.
+
+    Returns:
+        Tuple[Union[int, None], Union[int, None]]: A tuple containing the position of the tag and its length, or (None, None) if the tag is not found.
+    """
     location = None
     tag_length = None
 
@@ -70,7 +100,8 @@ def find_tag(tag: str, content: list) -> Tuple[Union[int, None], Union[int, None
             for element in item["paragraph"]["elements"]:
                 text_run = element.get("textRun")
                 if text_run and tag in text_run["content"]:
-                    location = element["startIndex"] + text_run["content"].index(tag)
+                    location = element["startIndex"] + \
+                        text_run["content"].index(tag)
                     tag_length = len(tag)
                     break
 
@@ -80,6 +111,16 @@ def find_tag(tag: str, content: list) -> Tuple[Union[int, None], Union[int, None
 # Builds the remove content range for removing tags
 # Returns a list of dict with the remove context
 def create_remove_content_requests(location: int, tag_length: int) -> List[dict]:
+    """
+    Builds a list of requests to remove content based on the location and tag length.
+
+    Args:
+        location (int): The position of the tag in the document.
+        tag_length (int): The length of the tag.
+
+    Returns:
+        List[dict]: A list of remove content requests.
+    """
     return [
         {
             "deleteContentRange": {
@@ -90,4 +131,13 @@ def create_remove_content_requests(location: int, tag_length: int) -> List[dict]
 
 
 def add_page_break(location: int) -> List[dict]:
+    """
+    Builds a list of requests to add a page break at the specified location.
+
+    Args:
+        location (int): The position at which to add the page break.
+
+    Returns:
+        List[dict]: A list of insert page break requests.
+    """
     return [{"insertPageBreak": {"location": {"index": location}}}]

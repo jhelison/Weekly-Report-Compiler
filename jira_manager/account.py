@@ -1,8 +1,13 @@
 from jira import JIRA
 import os
 
-# Make the login into Jira
+
 def new_jira() -> JIRA:
+    """Create a new JIRA instance and authenticate using the provided credentials.
+
+    Returns:
+        JIRA: JIRA instance with authentication.
+    """
 
     jira = JIRA(
         server=os.getenv("JIRA_SERVER"),

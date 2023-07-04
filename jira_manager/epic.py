@@ -4,6 +4,11 @@ from config.config import get_config
 
 # Get all the epics in "Work in Progress" status
 def epic_in_progress():
+    """Retrieve all the epics in 'Work in Progress' status.
+
+    Returns:
+        list: List of Jira issues representing the epics.
+    """
     jira = new_jira()
 
     epic_in_progress_jql = get_config()["jira"]["jql"]["epic_in_progress"]
@@ -19,6 +24,11 @@ def epic_in_progress():
 
 
 def epic_appendix_in_progress():
+    """Retrieve the appendix tasks for all the epics in 'Work in Progress' status.
+
+    Returns:
+        list: List of Jira issues representing the appendix tasks.
+    """
     jira = new_jira()
 
     appendix_tasks_list_jql = get_config()["jira"]["jql"]["appendix_task_list"]
@@ -32,6 +42,14 @@ def epic_appendix_in_progress():
 
 
 def epic_in_progress_tasks(epics):
+    """Retrieve all the tasks associated with the given epics.
+
+    Args:
+        epics (list): List of Jira issues representing the epics.
+
+    Returns:
+        dict: Dictionary mapping each epic to a list of associated tasks.
+    """
     jira = new_jira()
 
     epic_tasks_jql = get_config()["jira"]["jql"]["epic_tasks"]

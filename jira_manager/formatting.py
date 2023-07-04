@@ -2,8 +2,6 @@ from gdocs.elements.text import Text
 from gdocs.elements.util import Color, Status
 import os
 
-# This is the between gdocs and jira_manager
-
 CHIP_COLOR = Status.NONE.status_to_color()
 BACKGROUND_COLOR = Color(255, 217, 61)
 TABLE_HEADER = [
@@ -15,6 +13,14 @@ TABLE_HEADER = [
 
 
 def epic_in_progress_tasks_to_gdocs(tasks_by_epic):
+    """Convert tasks organized by epics to a format compatible with Google Docs.
+
+    Args:
+        tasks_by_epic (dict): Dictionary mapping each epic to a list of associated tasks.
+
+    Returns:
+        dict: Content dictionary with headers and text sections for Google Docs.
+    """
     jira_server = os.getenv("JIRA_SERVER")
 
     content = {}
@@ -110,6 +116,3 @@ def epic_in_progress_tasks_to_gdocs(tasks_by_epic):
                 row_num += 1
 
     return content
-
-
-# def epic_task_to_gdocs(epic, tasks):

@@ -9,6 +9,11 @@ from gdocs.scopes import SCOPES
 
 # Authenticate on google
 def authenticate_google():
+    """Authenticate with Google and obtain the Google Docs service.
+
+    Returns:
+        googleapiclient.discovery.build: Google Docs service instance.
+    """
     # Define the credentials files
     token_file = os.getenv("GOOGLE_TOKEN")
     credential_file = os.getenv("GOOGLE_CRED_FILE")
@@ -21,7 +26,8 @@ def authenticate_google():
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            flow = InstalledAppFlow.from_client_secrets_file(credential_file, SCOPES)
+            flow = InstalledAppFlow.from_client_secrets_file(
+                credential_file, SCOPES)
             creds = flow.run_local_server(port=0)
         # Save the credentials for the next run
         with open(token_file, "w") as token:
@@ -32,6 +38,14 @@ def authenticate_google():
 
 # Get a document content based on the document ID
 def get_document_content(document_id: str) -> dict:
+    """Retrieve the content of a Google Docs document.
+
+    Args:
+        document_id (str): ID of the Google Docs document.
+
+    Returns:
+        dict: Document content.
+    """
     service = authenticate_google()
 
     # Get the document content
@@ -43,6 +57,12 @@ def get_document_content(document_id: str) -> dict:
 
 # Apply requests to a document
 def apply_content(document_id: str, requests: list):
+    """Apply requests to modify the content of a Google Docs document.
+
+    Args:
+        document_id (str): ID of the Google Docs document.
+        requests (list): List of requests to apply.
+    """
     service = authenticate_google()
 
     service.documents().batchUpdate(
