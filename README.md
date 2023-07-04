@@ -72,6 +72,35 @@ cp .env.example .env
 
 Note: The environment variables mentioned above are necessary for the utility to authenticate and connect to Jira and Google Docs. Ensure that you have the required credentials and permissions for accessing the respective services.
 
+### Creating Jira custom fields
+
+1. Log in to your Jira account and navigate to your desired Jira project.
+2. Click on the "Settings" option in the left-hand sidebar.
+3. In the Project Settings menu, select "Screens" from the "Issue Features" section.
+4. On the Screens page, click on the "Custom Fields" tab.
+5. Click on the "Add Custom Field" button to create a new custom field.
+6. Choose the type of custom field that matches your requirements. For example, if you need a text field, select "Text Field (single line)".
+7. Configure the details of the custom field, such as the name, description, and field options.
+8. Save the custom field by clicking the "Create" or "Save" button.
+
+Repeat the above steps for each custom field mentioned in your configuration file.
+
+Ensure that you note down the custom field IDs assigned to each custom field you create. These IDs will be used to configure the application later.
+
+Once you have created the custom fields in Jira and obtained their IDs, update the corresponding values in your configuration file (config.toml) under the [jira] section:
+
+-   `task_weekly_report_field`: Update this field with the custom field ID for the task weekly report field.
+-   `epic_weekly_report_field`: Update this field with the custom field ID for the epic weekly report field.
+-   `epic_order_field`: Update this field with the custom field ID for the epic order field.
+
+Save the configuration file after making the necessary updates.
+
+These custom fields will be used by the application to fetch the required data from Jira for generating the weekly report.
+
+Please note that the exact steps to create custom fields may vary depending on your Jira version and configuration. Refer to the Jira documentation or contact your Jira administrator for further assistance if needed.
+
+Include these instructions in your README, preferably in the "Setting Up Custom Fields in Jira" section.
+
 ## Usage
 
 To use the utility, you need to provide the necessary configurations and credentials for Jira and Google Docs. This includes setting up environment variables and configuration files.
