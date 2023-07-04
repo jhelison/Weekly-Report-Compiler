@@ -1,4 +1,4 @@
-# Project Name
+# Jira - Gdocs: Weekly Report Compiler
 
 This project is a utility for working with Google Docs and Jira integration. It provides functionality to automate tasks related to managing and formatting content in Google Docs based on data from Jira.
 
