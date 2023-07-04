@@ -27,7 +27,7 @@ The Google Docs and Jira integration utility simplifies the process of working w
 
 To use this utility, follow these steps:
 
-1. Clone the repository: `git clone https://github.com/your-username/your-project.git`
+1. Clone the repository: `git clone git@github.com:jhelison/Weekly-Report-Compiler.git`
 2. Install pyenv for managing Python versions. Refer to the [pyenv documentation](https://github.com/pyenv/pyenv#installation) for installation instructions specific to your operating system.
 3. Install the required Python version for your project using pyenv. Run the following command in the project's root directory:
 
